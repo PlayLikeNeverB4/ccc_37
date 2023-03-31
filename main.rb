@@ -5,14 +5,11 @@ base_file_path = "level#{level}/level#{level}_#{test_id}"
 $input_file_path = base_file_path + '.in'
 $output_file_path = base_file_path + '.out.txt'
 
-# ALL_CHARS = "RPS"
-# $WINNER = {
-#   'PR' => 'P',
-#   'RS' => 'R',
-#   'PS' => 'S',
-# }
-
 def winner(fight)
+  if fight[0] == fight[1]
+    return fight[0]
+  end
+  fight = fight.chars.sort.join
   if fight == 'PR'
     'P'
   elsif fight == 'RS'
@@ -22,23 +19,37 @@ def winner(fight)
   end
 end
 
-$fight_count = nil
+def group_pairs(tour)
+  (tour.size/2).times.map do |index|
+    tour[2*index..2*index+1]
+  end
+end
+
+def winner_after_rounds(tour, round_count)
+  round_count.times do
+    new_tour = group_pairs(tour).map do |pair|
+      winner(pair)
+    end.join
+    tour = new_tour
+  end
+  tour
+end
+
+$tour_count = nil
+$tours = nil
+$player_count = nil
 
 def read_input
   f = File.open($input_file_path, 'r')
-  $fight_count = f.readline.to_i
-  $fights = $fight_count.times.map do
+  $tour_count, $player_count = f.readline.split.map(&:to_i)
+  $tours = $tour_count.times.map do
     f.readline.strip
   end
 end
 
 def solve
-  $fights.map do |fight|
-    if fight[0] == fight[1]
-      fight[0]
-    else
-      winner(fight.chars.sort.join)
-    end
+  $tours.map do |tour|
+    winner_after_rounds(tour, 2)
   end
 end
 
