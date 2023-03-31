@@ -5,36 +5,46 @@ base_file_path = "level#{level}/level#{level}_#{test_id}"
 $input_file_path = base_file_path + '.in'
 $output_file_path = base_file_path + '.out.txt'
 
-# $game_count = nil
-# $player_count = nil
-# $games = nil
+# ALL_CHARS = "RPS"
+# $WINNER = {
+#   'PR' => 'P',
+#   'RS' => 'R',
+#   'PS' => 'S',
+# }
+
+def winner(fight)
+  if fight == 'PR'
+    'P'
+  elsif fight == 'RS'
+    'R'
+  else
+    'S'
+  end
+end
+
+$fight_count = nil
 
 def read_input
   f = File.open($input_file_path, 'r')
-  # $game_count, $player_count = f.readline.split.map(&:to_i)
-  # $games = $game_count.times.map do
-  #   f.readline.split.map(&:to_i)
-  # end
+  $fight_count = f.readline.to_i
+  $fights = $fight_count.times.map do
+    f.readline.strip
+  end
 end
 
 def solve
-  # wins = Array.new($player_count, 0)
-  # $games.each do |game|
-  #   p1_id, p1_score, p2_id, p2_score = game
-  #   if ([ p2_score, -p2_id ] <=> [ p1_score, -p1_id ]) == -1
-  #     p1_id, p1_score, p2_id, p2_score = p2_id, p2_score, p1_id, p1_score
-  #   end
-  #   wins[p2_id] += 1
-  # end
-  # ranks = wins.each_with_index.sort_by{|s| [ -s[0], s[1] ] }
-  # ranks
+  $fights.map do |fight|
+    if fight[0] == fight[1]
+      fight[0]
+    else
+      winner(fight.chars.sort.join)
+    end
+  end
 end
 
 def write_output(sol)
   f = File.open($output_file_path, 'w')
-  # sol.each do |player|
-  #   f.puts("#{player[1]} #{player[0]}")
-  # end
+  f.puts(sol)
   f.close
 end
 
