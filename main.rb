@@ -13,12 +13,12 @@ def read_input
   f = File.open($input_file_path, 'r')
   $tour_count, $player_count = f.readline.split.map(&:to_i)
   $tours = $tour_count.times.map do
-    line = f.readline.strip.split
-    line.map do |s|
-      fighter = s[s.size-1]
-      amount = s[0..s.size-2].to_i
-      [ fighter, amount ]
-    end.sort
+    line = f.readline.strip#.split
+    # line.map do |s|
+    #   fighter = s[s.size-1]
+    #   amount = s[0..s.size-2].to_i
+    #   [ fighter, amount ]
+    # end.sort
   end
 end
 
@@ -280,49 +280,70 @@ def solve_68(tour)
   sequence(tour[3]) + sequence(tour[1]) + sequence(tour[2]) + sequence(tour[0]) + sequence(tour[4])
 end
 
+def random_fill(t)
+  nt = t.dup
+  t.size.times do |i|
+    nt[i] = 'PSLYR'.chars.sample if nt[i] == 'X'
+  end
+  nt
+end
+
+def solve_x_tour(t)
+  total_rounds = round_count($player_count)
+  nt = random_fill(t)
+  w = winner_after_rounds(nt, total_rounds)
+  while w != 'S'
+    nt = random_fill(t)
+    w = winner_after_rounds(nt, total_rounds)
+  end
+  nt
+end
+
 def solve
   $tours.each_with_index.map do |tour, index|
-    # next if index+1 < 38
-    # TODO: 68
-    # next if index+1 < 68
-    puts "Test \##{index+1}/#{$tours.size}"
-    puts tour.to_s
-    # pc, rc, sc = tour.map(&:last)
-    # t = build_tour(pc, rc, sc, $player_count)
-    # build_tour([ tour[3], tour[0], tour[1], tour[4], tour[2] ], $player_count)
+    t = solve_x_tour(tour)
 
-    t = build_random_tour(tour)
-    # t = solve_68(tour)
-    puts t.size
-    puts simulate_best_s(t)[0]
-    puts tour.to_s
+  #   # next if index+1 < 38
+  #   # TODO: 68
+  #   # next if index+1 < 68
+  #   puts "Test \##{index+1}/#{$tours.size}"
+  #   puts tour.to_s
+  #   # pc, rc, sc = tour.map(&:last)
+  #   # t = build_tour(pc, rc, sc, $player_count)
+  #   # build_tour([ tour[3], tour[0], tour[1], tour[4], tour[2] ], $player_count)
 
-    total = tour.map(&:last).sum
-  # total_rounds = round_count($player_count)
-  total_rounds = round_count(total)
-    best_s, last_ok_t = simulate_best_s(t)
-  # t = last_ok_t
-  puts best_s
-  while best_s < total_rounds
-    a, b = rand(t.size), rand(t.size)
-    # c, d = rand(t.size), rand(t.size)
-    # new_t = t.dup
-    next if t[a] == t[b]
-    t[a], t[b] = t[b], t[a]
-    # t[c], t[d] = t[c], t[d]
+  #   t = build_random_tour(tour)
+  #   # t = solve_68(tour)
+  #   puts t.size
+  #   puts simulate_best_s(t)[0]
+  #   puts tour.to_s
 
-    new_best_s, new_last_ok_t = simulate_best_s(t)
-    # new_best_s += best_s
-    if new_best_s > best_s || (new_best_s == best_s && rand() < 0.5)
-      puts new_best_s if new_best_s > best_s
-      best_s = new_best_s
-      # t = new_last_ok_t
-      # puts best_s
-    else
-      t[a], t[b] = t[b], t[a]
-      # t[c], t[d] = t[c], t[d]
-    end
-  end
+  #   total = tour.map(&:last).sum
+  # # total_rounds = round_count($player_count)
+  # total_rounds = round_count(total)
+  #   best_s, last_ok_t = simulate_best_s(t)
+  # # t = last_ok_t
+  # puts best_s
+  # while best_s < total_rounds
+  #   a, b = rand(t.size), rand(t.size)
+  #   # c, d = rand(t.size), rand(t.size)
+  #   # new_t = t.dup
+  #   next if t[a] == t[b]
+  #   t[a], t[b] = t[b], t[a]
+  #   # t[c], t[d] = t[c], t[d]
+
+  #   new_best_s, new_last_ok_t = simulate_best_s(t)
+  #   # new_best_s += best_s
+  #   if new_best_s > best_s || (new_best_s == best_s && rand() < 0.5)
+  #     puts new_best_s if new_best_s > best_s
+  #     best_s = new_best_s
+  #     # t = new_last_ok_t
+  #     # puts best_s
+  #   else
+  #     t[a], t[b] = t[b], t[a]
+  #     # t[c], t[d] = t[c], t[d]
+  #   end
+  # end
     # t = solve_38(tour)
 
     after = winner_after_rounds(t, round_count($player_count))
