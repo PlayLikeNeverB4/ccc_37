@@ -13,12 +13,7 @@ def read_input
   f = File.open($input_file_path, 'r')
   $tour_count, $player_count = f.readline.split.map(&:to_i)
   $tours = $tour_count.times.map do
-    line = f.readline.strip#.split
-    # line.map do |s|
-    #   fighter = s[s.size-1]
-    #   amount = s[0..s.size-2].to_i
-    #   [ fighter, amount ]
-    # end.sort
+    line = f.readline.strip
   end
 end
 
@@ -86,49 +81,6 @@ def simulate_best_s(tour)
   [ round, last_ok_round ]
 end
 
-# c = [ sc, lc, pc, yc, rc ]
-# S must win
-# S wins against S, L, P
-# S loses against Y, R
-def build_tour(c, count)
-  # puts "#{count} - #{pc},#{rc},#{sc}"
-  # if rc == 0
-  #   return 'S' * sc + 'P' * pc
-  # end
-  # raise StandardError.new('error') if count <= 2
-  # raise StandardError.new('no paper?') if pc == 0
-
-  [ 0, 1, 2 ].each do |w|
-    cc = c.rotate(w)
-
-
-  end
-
-  # other = S
-  other_side = count / 2
-  build_tour(sc, lc, pc, yc, rc, count / 2)
-  # other = L
-  build_tour(lc, pc, yc, rc, sc, count / 2)
-  # other = P
-  build_tour(pc, yc, rc, sc, lc, count / 2)
-
-  # pc -= 1
-  # other_side -= 1
-  # ro = [ rc, other_side ].min
-  # rc -= ro
-  # other_side -= ro
-  # po = [ other_side, pc ].min
-  # pc -= po
-  # other_side -= po
-  # so = [ other_side, sc ].min
-  # sc -= so
-  # other_side -= so
-
-  # right = 'P' + 'R' * ro + 'P' * po + 'S' * so
-  # left = build_tour(pc, rc, sc, count / 2)
-
-  # left + right
-end
 
 def round_count(player_count)
   c = 0
@@ -137,59 +89,6 @@ def round_count(player_count)
     player_count /= 2
   end
   c
-end
-
-# S winner => SS, SP, SL => left = S, right = P/L/S
-# 
-# PL: loses to S, R 50/50, beats Y
-
-# 3 ** R
-
-# S, L, P, Y, R
-
-def rec_random_tour(t)
-  total_rounds = round_count(t.size)
-
-  ids = t.size.times.to_a
-
-  best_s, last_ok_t = simulate_best_s(t)
-  t = last_ok_t
-  puts best_s
-  while best_s < total_rounds
-    # normal_swap = rand() < 0.5
-    normal_swap = true
-    if normal_swap
-      a, b = rand(t.size), rand(t.size)
-      # c, d = rand(t.size), rand(t.size)
-      # new_t = t.dup
-      ids[a], ids[b] = ids[b], ids[a]
-      t[a], t[b] = t[b], t[a]
-      # t[c], t[d] = t[c], t[d]
-    else
-
-    end
-
-    new_best_s, new_last_ok_t = simulate_best_s(t)
-    new_best_s += best_s
-    if new_best_s > best_s || (new_best_s == best_s && rand() < 0.5)
-      if new_best_s > best_s
-        rec_ids = rec_random_tour(new_last_ok_t)
-        puts rec_ids
-        break
-      end
-      best_s = new_best_s
-      t = last_ok_t
-      # puts best_s
-    else
-      if normal_swap
-        ids[a], ids[b] = ids[b], ids[a]
-        t[a], t[b] = t[b], t[a]
-        # t[c], t[d] = t[c], t[d]
-      end
-    end
-  end
-
-  ids
 end
 
 def build_random_tour(tour)
@@ -222,8 +121,6 @@ def build_random_tour(tour)
   # t = tour.map{|c| c[0] * c[1] }.join
   # t = t.chars.shuffle.join
   t = solve_38(tour)
-
-  # rec_random_tour(t)
 
   best_s, last_ok_t = simulate_best_s(t)
   # t = last_ok_t
@@ -308,9 +205,6 @@ def solve
   #   # next if index+1 < 68
   #   puts "Test \##{index+1}/#{$tours.size}"
   #   puts tour.to_s
-  #   # pc, rc, sc = tour.map(&:last)
-  #   # t = build_tour(pc, rc, sc, $player_count)
-  #   # build_tour([ tour[3], tour[0], tour[1], tour[4], tour[2] ], $player_count)
 
   #   t = build_random_tour(tour)
   #   # t = solve_68(tour)
