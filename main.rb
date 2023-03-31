@@ -52,27 +52,52 @@ def read_input
   end
 end
 
-# rock loses to paper
-# rock-rock is also good
-# SSS...PRPRPRPR
+def build_tour(pc, rc, sc, count)
+  # puts "#{count} - #{pc},#{rc},#{sc}"
+  if rc == 0
+    return 'S' * sc + 'P' * pc
+  end
+  raise StandardError.new('error') if count <= 2
+  raise StandardError.new('no paper?') if pc == 0
+
+  other_side = count / 2
+
+  pc -= 1
+  other_side -= 1
+  ro = [ rc, other_side ].min
+  rc -= ro
+  other_side -= ro
+  po = [ other_side, pc ].min
+  pc -= po
+  other_side -= po
+  so = [ other_side, sc ].min
+  sc -= so
+  other_side -= so
+
+  right = 'P' + 'R' * ro + 'P' * po + 'S' * so
+  left = build_tour(pc, rc, sc, count / 2)
+
+  left + right
+end
+
+def round_count(player_count)
+  c = 0
+  while player_count > 1
+    c += 1
+    player_count /= 2
+  end
+  c
+end
+
 def solve
   $tours.map do |tour|
-    puts tour.to_s
     pc, rc, sc = tour.map(&:last)
-    prrr = [ pc, rc / 3 ].min
-    pc -= prrr
-    rc -= prrr * 3
-    # prr = [ pc, rc / 2 ].min
-    # pc -= prr
-    # rc -= prr * 2
-    pr = [ pc, rc ].min
-    pc -= pr
-    rc -= pr
-    # raise StandardError.new('too many rocks') if rc > 0
-    t = 'S' * sc + 'P' * pc + 'R' * rc + 'PR' * pr + 'PRRR' * prrr
-    after = winner_after_rounds(t, 2)
-    puts t, after
-    raise StandardError.new('bad tour') if after.include?('R') || !after.include?('S')
+    t = build_tour(pc, rc, sc, $player_count)
+
+    after = winner_after_rounds(t, round_count($player_count))
+    # puts t, after
+    raise StandardError.new('bad tour') if after != 'S'
+
     t
   end
 end
