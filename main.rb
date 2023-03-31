@@ -43,13 +43,37 @@ def read_input
   f = File.open($input_file_path, 'r')
   $tour_count, $player_count = f.readline.split.map(&:to_i)
   $tours = $tour_count.times.map do
-    f.readline.strip
+    line = f.readline.strip.split
+    line.map do |s|
+      fighter = s[s.size-1]
+      amount = s[0..s.size-2].to_i
+      [ fighter, amount ]
+    end.sort
   end
 end
 
+# rock loses to paper
+# rock-rock is also good
+# SSS...PRPRPRPR
 def solve
   $tours.map do |tour|
-    winner_after_rounds(tour, 2)
+    puts tour.to_s
+    pc, rc, sc = tour.map(&:last)
+    prrr = [ pc, rc / 3 ].min
+    pc -= prrr
+    rc -= prrr * 3
+    # prr = [ pc, rc / 2 ].min
+    # pc -= prr
+    # rc -= prr * 2
+    pr = [ pc, rc ].min
+    pc -= pr
+    rc -= pr
+    # raise StandardError.new('too many rocks') if rc > 0
+    t = 'S' * sc + 'P' * pc + 'R' * rc + 'PR' * pr + 'PRRR' * prrr
+    after = winner_after_rounds(t, 2)
+    puts t, after
+    raise StandardError.new('bad tour') if after.include?('R') || !after.include?('S')
+    t
   end
 end
 
